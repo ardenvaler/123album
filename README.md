@@ -4,6 +4,8 @@ A personal work dashboard you can open straight from disk. It has an Apple-keyno
 natural-language search, quick analysis of tables, reminders that pop up when they come due, and an
 assistant that briefs you on your data and suggests what to ask.
 
+**Live link (private):** https://claude.ai/artifact/3G2iJeYJr3XUJoWU3sEUrF
+
 **No build step, no server, no dependencies.** Open `index.html` in a browser, or publish the repo
 with GitHub Pages. Search runs entirely in your browser.
 
@@ -83,6 +85,7 @@ assets/css/style.css     design system (light + dark)
 assets/js/core/          engine: text, dates, analysis, store, query, reminders, insights
 assets/js/ui/            charts, templates, assistant, app controller
 data/                    your data
+tools/build_artifact.py  bundles everything into one HTML file for the live link
 ```
 
 Tip: add `?today=2026-10-08` to the URL to preview the dashboard as of another date.

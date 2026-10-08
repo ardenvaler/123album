@@ -611,13 +611,9 @@
     }, { passive: true });
   }
 
-  var io = null;
+  // Everything animates in on load (staggered by --i) so the page is complete without scrolling
   function revealObserver() {
-    if (!('IntersectionObserver' in window) || reduceMotion) { $$('.reveal, .tile').forEach(function (n) { n.classList.add('in'); }); return; }
-    io = io || new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-    $$('.reveal:not(.in), .tile:not(.in)').forEach(function (n) { io.observe(n); });
+    $$('.reveal:not(.in), .tile:not(.in)').forEach(function (n) { n.classList.add('in'); });
   }
 
   function countUp(root) {

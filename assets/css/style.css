@@ -192,7 +192,7 @@ body.searching .blob { opacity: .55; }
 
 /* ---------- Nav ---------- */
 .nav {
-  position: sticky; top: 0; z-index: 40;
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40;
   height: 56px; padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
   display: flex; align-items: center; gap: 16px;
   background: transparent;
@@ -494,6 +494,7 @@ body.searching .search-wrap { margin-top: 0; }
 /* Metrics tile */
 .tile-metrics { display: flex; flex-direction: column; }
 .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; flex: 1; }
+@media (min-width: 1061px) { .metric-grid { grid-template-columns: repeat(2, 1fr); } .mt { min-height: 0; } }
 .mt { position: relative; padding: 16px; border-radius: 20px; background: var(--surface-2); cursor: pointer; transition: transform .35s var(--spring), background-color .2s; display: flex; flex-direction: column; min-height: 150px; }
 .mt:hover { transform: translateY(-3px); background: var(--surface-3); }
 .mt small { font-size: 13px; color: var(--ink-2); font-weight: 500; line-height: 1.25; }
