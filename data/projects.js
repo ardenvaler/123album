@@ -5,7 +5,7 @@
  *
  * SAMPLE DATA — replace with your own.
  */
-Atlas.project(
+Metis.project(
   {
     name: 'Apollo Platform',
     aliases: ['Apollo'],

@@ -3,8 +3,8 @@
  */
 (function () {
   'use strict';
-  var T = Atlas.text, D = Atlas.dates, C = Atlas.charts;
-  var V = (Atlas.view = {});
+  var T = Metis.text, D = Metis.dates, C = Metis.charts;
+  var V = (Metis.view = {});
   var esc = T.esc;
 
   var ICONS = {
@@ -29,11 +29,11 @@
   V.icon = function (name, cls) {
     return '<svg class="ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || ICONS.box) + '</svg>';
   };
-  V.typeIcon = function (type) { var t = Atlas.store.TYPES[type]; return V.icon(t ? t.icon : 'box'); };
+  V.typeIcon = function (type) { var t = Metis.store.TYPES[type]; return V.icon(t ? t.icon : 'box'); };
 
   var TONE_ICON = { good: 'check', info: 'pulse', critical: 'alert', serious: 'alert', warning: 'clock', neutral: 'box' };
   V.status = function (key) {
-    var s = Atlas.store.STATUS[key];
+    var s = Metis.store.STATUS[key];
     if (!s) return '';
     return '<span class="pill tone-' + s.tone + '"><i class="pill-dot"></i>' + esc(s.label) + '</span>';
   };
@@ -85,7 +85,7 @@
           (m.target != null ? '<div class="target-line">' + C.meter(m.value, m.target, m.higherIsBetter) + '<small>Target ' + T.fmt(m.target, m.unit) + '</small></div>' : '');
         break;
       case 'reminder':
-        var s = Atlas.reminders.state(e), d = s.occ;
+        var s = Metis.reminders.state(e), d = s.occ;
         cls += ' st-' + s.state;
         body = '<div class="rem-row">' +
           (d ? '<div class="cal"><span>' + D.MON3[d.getMonth()].toUpperCase() + '</span><b>' + d.getDate() + '</b></div>' : '<div class="cal cond">' + V.icon('bolt') + '</div>') +
@@ -99,7 +99,7 @@
       default:
         body = '<h3 class="card-title sm">' + esc(e.title) + '</h3>' + (e.text && e.text !== e.title ? '<p class="card-text">' + esc(e.text) + '</p>' : '');
     }
-    var typeLabel = Atlas.store.TYPES[e.type] ? Atlas.store.TYPES[e.type].label : T.cap(e.type);
+    var typeLabel = Metis.store.TYPES[e.type] ? Metis.store.TYPES[e.type].label : T.cap(e.type);
     return '<article class="' + cls + '" tabindex="0" data-open="' + esc(e.id) + '" style="--i:' + (i || 0) + '">' +
       '<header class="card-head"><span class="type type-' + esc(e.type) + '">' + V.typeIcon(e.type) + typeLabel + '</span><span class="card-meta">' + meta(e) + '</span></header>' +
       body + V.kw(e, 3) + '</article>';
@@ -112,7 +112,7 @@
       '<div class="proj-row">' + (prog != null ? '<div class="proj-ring">' + C.ring(prog / 100, { size: 58, stroke: 6 }) + '<b>' + prog + '<small>%</small></b></div>' : '') +
       '<div><h3 class="card-title">' + esc(p.name) + '</h3>' + (p.description ? '<p class="card-sub">' + esc(p.description) + '</p>' : '') + '</div></div>' +
       (p.last ? '<p class="card-text sm"><span class="muted">Latest · ' + esc(D.relative(p.lastDate)) + '</span><br>' + esc(p.last.title) + '</p>' : '') +
-      '<div class="proj-counts">' + Object.keys(p.counts).map(function (t) { var ty = Atlas.store.TYPES[t]; return '<span>' + p.counts[t] + ' ' + (ty ? (p.counts[t] === 1 ? ty.label : ty.plural).toLowerCase() : t) + '</span>'; }).join('') + '</div>' +
+      '<div class="proj-counts">' + Object.keys(p.counts).map(function (t) { var ty = Metis.store.TYPES[t]; return '<span>' + p.counts[t] + ' ' + (ty ? (p.counts[t] === 1 ? ty.label : ty.plural).toLowerCase() : t) + '</span>'; }).join('') + '</div>' +
       '</article>';
   };
 
@@ -129,7 +129,7 @@
 
   // ---------- detail sheets ----------
   V.sheet = function (e) {
-    var typeLabel = Atlas.store.TYPES[e.type] ? Atlas.store.TYPES[e.type].label : T.cap(e.type);
+    var typeLabel = Metis.store.TYPES[e.type] ? Metis.store.TYPES[e.type].label : T.cap(e.type);
     var h = '<header class="sheet-head"><span class="type type-' + esc(e.type) + '">' + V.typeIcon(e.type) + typeLabel + '</span>' +
       '<h2 id="sheetTitle">' + esc(e.title) + '</h2><p class="sheet-meta">' + meta(e) + (e.date && e.type !== 'reminder' ? '<span class="dot-sep">·</span>' + esc(D.fmt(e.date, 'long')) : '') + '</p></header>';
     if (e.type === 'table') h += tableSheet(e);
@@ -158,12 +158,12 @@
   }
 
   function relatedBlock(e) {
-    var p = Atlas.store.projectByKey.get(e.projectKey);
+    var p = Metis.store.projectByKey.get(e.projectKey);
     if (!p) return '';
     var rel = p.entries.filter(function (x) { return x !== e; }).sort(function (a, b) { return (b.date || 0) - (a.date || 0); }).slice(0, 6);
     if (!rel.length) return '';
     return '<section class="sheet-sec"><h4>More in ' + esc(p.name) + '</h4><ol class="timeline">' + rel.map(function (x) {
-      return '<li data-open="' + esc(x.id) + '" tabindex="0"><span class="tl-dot tone-' + (x.status ? Atlas.store.STATUS[x.status].tone : 'neutral') + '"></span>' +
+      return '<li data-open="' + esc(x.id) + '" tabindex="0"><span class="tl-dot tone-' + (x.status ? Metis.store.STATUS[x.status].tone : 'neutral') + '"></span>' +
         '<span class="tl-date">' + esc(x.date ? D.fmt(x.date) : '') + '</span><span class="tl-t">' + esc(x.title) + '</span></li>';
     }).join('') + '</ol></section>';
   }
@@ -198,7 +198,7 @@
       if (an.catIdx.length && an.columns[cur].additive) {
         var ci0 = an.catIdx[0];
         h += '<section class="sheet-sec"><h4>' + esc(an.columns[cur].name) + ' by ' + esc(an.columns[ci0].name.toLowerCase()) + '</h4>' +
-          C.bars(Atlas.analyze.groupBy(tb, ci0, cur, 'sum').map(function (g) { return { key: g.key, value: g.value }; }), { unit: an.columns[cur].unit || (an.columns[cur].money ? '$' : ''), share: true, highlightTop: true }) + '</section>';
+          C.bars(Metis.analyze.groupBy(tb, ci0, cur, 'sum').map(function (g) { return { key: g.key, value: g.value }; }), { unit: an.columns[cur].unit || (an.columns[cur].money ? '$' : ''), share: true, highlightTop: true }) + '</section>';
       }
     }
     h += '<section class="sheet-sec"><div class="sec-head"><h4>Data</h4><span class="muted">' + an.rows + ' rows · click a header to sort</span></div>' + V.dataTable(tb) + '</section>';
@@ -210,7 +210,7 @@
     var series = tb.rows.map(function (r, i) { return { label: an.labelIdx >= 0 ? r[an.labelIdx] : '#' + (i + 1), v: T.parseNum(r[ci]) }; });
     // When there is a category column and no ordering, aggregate so the chart stays readable
     if (!an.ordered && an.labelIdx >= 0 && an.columns[an.labelIdx].type === 'text' && new Set(series.map(function (s) { return s.label; })).size < series.length) {
-      series = Atlas.analyze.groupBy(tb, an.labelIdx, ci, c.additive ? 'sum' : 'avg').map(function (g) { return { label: g.key, v: g.value }; });
+      series = Metis.analyze.groupBy(tb, an.labelIdx, ci, c.additive ? 'sum' : 'avg').map(function (g) { return { label: g.key, v: g.value }; });
     }
     return C.series(series, { unit: c.unit || (c.money ? '$' : ''), ordered: an.ordered, title: c.name });
   };
@@ -240,13 +240,13 @@
       '<p class="muted">' + (m.onTarget ? V.tonePill('good', 'On target') : V.tonePill('serious', 'Off target')) + ' Target ' + T.fmt(m.target, m.unit) + ' · ' + (m.higherIsBetter ? 'higher' : 'lower') + ' is better</p></section>';
     if (m.history.length > 1) h += '<section class="sheet-sec"><h4>History</h4><div class="chart-box s1">' +
       C.series(m.history.map(function (v, i) { return { label: i === m.history.length - 1 ? 'Now' : '−' + (m.history.length - 1 - i), v: v }; }), { unit: m.unit, ordered: true, kind: 'line', title: e.title }) + '</div></section>';
-    var watchers = Atlas.store.entries.filter(function (x) { return x.type === 'reminder' && x.reminder.condition && (x.reminder.condition.metric === e.id || T.norm(x.reminder.condition.metric) === T.norm(e.title)); });
+    var watchers = Metis.store.entries.filter(function (x) { return x.type === 'reminder' && x.reminder.condition && (x.reminder.condition.metric === e.id || T.norm(x.reminder.condition.metric) === T.norm(e.title)); });
     if (watchers.length) h += '<section class="sheet-sec"><h4>Watched by</h4>' + watchers.map(function (w) { return V.card(w, 0); }).join('') + '</section>';
     return h;
   }
 
   function reminderSheet(e) {
-    var s = Atlas.reminders.state(e), r = e.reminder, h = '';
+    var s = Metis.reminders.state(e), r = e.reminder, h = '';
     h += '<div class="rem-hero st-' + s.state + '">' + (s.occ ? '<div class="cal lg"><span>' + D.MON3[s.occ.getMonth()].toUpperCase() + '</span><b>' + s.occ.getDate() + '</b></div>' : '<div class="cal lg cond">' + V.icon('bolt') + '</div>') +
       '<div><p class="rem-state lg">' + esc(s.label) + '</p>' + (s.occ ? '<p class="muted">' + esc(D.fmt(s.occ, 'long')) + (r.time ? ' at ' + esc(r.time) : '') + '</p>' : '') + '</div></div>';
     if (e.text) h += '<p class="sheet-text">' + esc(e.text) + '</p>';
@@ -269,7 +269,7 @@
     if (p.progress != null) h += '<div class="proj-hero">' + C.ring(p.progress / 100, { size: 120, stroke: 10, cls: 'big' }) + '<b>' + Math.round(p.progress) + '<small>%</small></b></div>';
     var list = p.entries.slice().sort(function (a, b) { return (b.date || 0) - (a.date || 0); });
     h += '<section class="sheet-sec"><h4>Timeline</h4><ol class="timeline">' + list.map(function (x) {
-      return '<li data-open="' + esc(x.id) + '" tabindex="0"><span class="tl-dot tone-' + (x.status ? Atlas.store.STATUS[x.status].tone : 'neutral') + '"></span>' +
+      return '<li data-open="' + esc(x.id) + '" tabindex="0"><span class="tl-dot tone-' + (x.status ? Metis.store.STATUS[x.status].tone : 'neutral') + '"></span>' +
         '<span class="tl-date">' + esc(x.date ? D.fmt(x.date) : '') + '</span><span class="tl-t">' + V.typeIcon(x.type) + esc(x.title) + '</span></li>';
     }).join('') + '</ol></section>';
     return h;

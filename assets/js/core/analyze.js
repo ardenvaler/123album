@@ -1,14 +1,14 @@
 /*
  * Table parsing + quick analysis.
  *
- * Atlas.analyze.parseCSV(text)        -> { columns, rows }
- * Atlas.analyze.table(columns, rows)  -> analysis object (column profiles, insights)
- * Atlas.analyze.aggregate(table, op, colIdx, byIdx, n)
+ * Metis.analyze.parseCSV(text)        -> { columns, rows }
+ * Metis.analyze.table(columns, rows)  -> analysis object (column profiles, insights)
+ * Metis.analyze.aggregate(table, op, colIdx, byIdx, n)
  */
 (function () {
   'use strict';
-  var T = Atlas.text, D = Atlas.dates;
-  var A = (Atlas.analyze = {});
+  var T = Metis.text, D = Metis.dates;
+  var A = (Metis.analyze = {});
 
   A.parseCSV = function (text) {
     text = String(text || '').replace(/^﻿/, '').replace(/\r\n?/g, '\n').trim();

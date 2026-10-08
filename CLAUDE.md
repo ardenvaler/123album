@@ -1,4 +1,4 @@
-# Atlas — notes for Claude
+# Metis — notes for Claude
 
 Personal work dashboard (static HTML/CSS/vanilla JS, no build, no dependencies). The owner feeds
 data in chat; Claude turns it into entries in `/data`.
@@ -9,7 +9,7 @@ The dashboard is published as a private claude.ai artifact:
 **https://claude.ai/artifact/3G2iJeYJr3XUJoWU3sEUrF**
 
 After **every** change (data or code): rebuild the single-file bundle with
-`python3 tools/build_artifact.py <scratchpad>/atlas.html`, republish it to that URL with the Artifact
+`python3 tools/build_artifact.py <scratchpad>/metis.html`, republish it to that URL with the Artifact
 tool (pass the URL as `url`; read it first if this session hasn't), commit + push, and give the owner
 the link in the reply.
 

@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  var T = (Atlas.text = {});
+  var T = (Metis.text = {});
 
   var STOP = (
     'a an and are as at be been being but by can could did do does doing done for from had has have having ' +

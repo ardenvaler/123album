@@ -11,7 +11,7 @@
  *
  * SAMPLE DATA — replace with your own.
  */
-Atlas.add(
+Metis.add(
   {
     type: 'table', title: 'Monthly Revenue 2026', date: '2026-10-03',
     keywords: ['revenue', 'finance', 'monthly'],

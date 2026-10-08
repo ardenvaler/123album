@@ -5,13 +5,13 @@
  */
 (function () {
   'use strict';
-  var T = Atlas.text, D = Atlas.dates, S = Atlas.store, I = Atlas.insights, V;
+  var T = Metis.text, D = Metis.dates, S = Metis.store, I = Metis.insights, V;
   var esc = T.esc;
-  var A = (Atlas.assistant = {});
+  var A = (Metis.assistant = {});
   var el = {}, greeted = false, asked = new Set();
 
   function init() {
-    V = Atlas.view;
+    V = Metis.view;
     ['assistant', 'assistantBtn', 'assistantClose', 'assistantLog', 'assistantForm', 'assistantQ'].forEach(function (id) { el[id] = document.getElementById(id); });
     el.assistantBtn.addEventListener('click', function () { A.toggle(); });
     el.assistantClose.addEventListener('click', function () { A.close(); });
@@ -26,7 +26,7 @@
       if (!t) return;
       ev.stopPropagation();
       if (t.dataset.ask) A.ask(t.dataset.ask);
-      else if (t.dataset.dash) { Atlas.search(t.dataset.dash); if (innerWidth < 760) A.close(); }
+      else if (t.dataset.dash) { Metis.search(t.dataset.dash); if (innerWidth < 760) A.close(); }
       else if (t.dataset.undoLocal) { S.removeLocal(t.dataset.undoLocal); t.closest('.msg').querySelector('.msg-body').insertAdjacentHTML('beforeend', '<p class="muted">Removed.</p>'); t.remove(); }
       else if (t.dataset.copy != null) {
         var pre = t.closest('.msg').querySelector('pre');
@@ -103,7 +103,7 @@
     if (/^(help|\?|what can you do|how do (i|you) (use|work)( this)?|tips?)\b/.test(n)) return reply(helpReply());
     if (/^(brief me|briefing|summary|summari[sz]e|what('?s| is) important|what needs (my )?attention|status report|morning brief|anything i should know)/.test(n)) return reply(briefing());
     if (/^(dark|light)( mode| theme)?$|^(switch|change) to (dark|light)/.test(n)) {
-      var th = /dark/.test(n) ? 'dark' : 'light'; Atlas.setTheme(th);
+      var th = /dark/.test(n) ? 'dark' : 'light'; Metis.setTheme(th);
       return reply('<p>Switched to ' + th + ' mode.</p>', 200);
     }
     if (/^(enable|turn on|allow) (desktop |system )?notifications?/.test(n)) { enableNotifications(); return; }
@@ -119,7 +119,7 @@
   };
 
   function searchReply(q) {
-    var res = Atlas.query.run(q);
+    var res = Metis.query.run(q);
     if (res.answer && res.answer.kind === 'help') return helpReply();
     var h = '<p>' + (res.answer ? res.answer.html : '') + '</p>';
     if (res.didYouMean) h += '<p class="muted">Did you mean <button class="link" data-ask="' + esc(res.didYouMean) + '">' + esc(res.didYouMean) + '</button>?</p>';
@@ -130,7 +130,7 @@
       return '<li data-project="' + esc(p.key) + '">' + V.icon('folder') + '<span>' + esc(p.name) + '</span><small>' + (p.progress != null ? Math.round(p.progress) + '%' : '') + '</small></li>';
     }).join('') + '</ul>';
     if (rows.length) h += '<ul class="msg-list">' + rows.map(function (x) {
-      var e = x.entry, sub = e.type === 'reminder' ? Atlas.reminders.state(e).label : e.type === 'metric' ? T.fmt(e.metric.value, e.metric.unit) : e.date ? D.relative(e.date) : '';
+      var e = x.entry, sub = e.type === 'reminder' ? Metis.reminders.state(e).label : e.type === 'metric' ? T.fmt(e.metric.value, e.metric.unit) : e.date ? D.relative(e.date) : '';
       return '<li data-open="' + esc(e.id) + '">' + V.typeIcon(e.type) + '<span>' + esc(e.title) + '</span><small>' + esc(sub) + '</small></li>';
     }).join('') + '</ul>';
     if (res.items.length > 4 || res.agg) h += '<button class="msg-cta" data-dash="' + esc(q) + '">Show ' + (res.agg ? 'it' : 'all ' + res.items.length) + ' on the dashboard ' + V.icon('arrow') + '</button>';
@@ -218,9 +218,9 @@
   }
 
   function exportReply() {
-    var list = Atlas.storage.get('local', []);
+    var list = Metis.storage.get('local', []);
     if (!list.length) return '<p>Nothing captured in this browser yet. Things you add with “remind me…”, “note:…” or “log:…” land here.</p>';
-    var js = 'Atlas.add(\n' + list.map(function (r) {
+    var js = 'Metis.add(\n' + list.map(function (r) {
       var c = {}; Object.keys(r).forEach(function (k) { if (k !== 'id' && k !== 'created') c[k] = r[k]; });
       return '  ' + JSON.stringify(c);
     }).join(',\n') + '\n);';

@@ -1,4 +1,4 @@
-# Atlas — personal control center
+# Metis — personal control center
 
 A personal work dashboard you can open straight from disk. It has an Apple-keynote-style landing page,
 natural-language search, quick analysis of tables, reminders that pop up when they come due, and an
@@ -14,7 +14,7 @@ with GitHub Pages. Search runs entirely in your browser.
 | Tile | What it shows |
 |---|---|
 | **Next up** | The most urgent reminder with a countdown ring, plus the next few |
-| **Atlas noticed** | Rotating insights: overdue items, metrics off target, biggest movers, quiet projects, recent wins |
+| **Metis noticed** | Rotating insights: overdue items, metrics off target, biggest movers, quiet projects, recent wins |
 | **This week** | Updates logged, wins, reminders due soon, active projects |
 | **Projects** | Status and progress for each project, discovered automatically |
 | **Latest** | Your most recent updates and notes |
@@ -40,7 +40,7 @@ your data are corrected ("Did you mean…").
 
 ## Assistant
 
-Click **Ask Atlas** (or `⌘J`). It answers the same questions conversationally and also handles:
+Click **Ask Metis** (or `⌘J`). It answers the same questions conversationally and also handles:
 
 - `brief me` / `what needs my attention`: a prioritized briefing
 - `remind me to send the deck on Friday at 9am`: creates a reminder (saved in this browser)
@@ -57,7 +57,7 @@ occurrence. Repeating reminders (weekly, monthly, yearly and so on) roll forward
 
 ## Keywords
 
-Your own `keywords` are used first. Atlas also derives keywords from the content:
+Your own `keywords` are used first. Metis also derives keywords from the content:
 
 - names, products and acronyms (capitalized words mid-sentence), plus `#hashtags`
 - the most distinctive words in each entry (TF-IDF across all your data)

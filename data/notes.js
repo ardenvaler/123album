@@ -9,7 +9,7 @@
  *
  * SAMPLE DATA — replace with your own.
  */
-Atlas.add(
+Metis.add(
   {
     type: 'note', date: '2026-10-04', project: 'Apollo Platform', title: 'Idea: self-serve report builder',
     text: 'Once the migration is done, a self-serve report builder could remove ~30% of ad-hoc requests. Ask Priya for design time in Q1.',

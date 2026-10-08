@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  var D = (Atlas.dates = {});
+  var D = (Metis.dates = {});
   var DAY = 864e5;
 
   D.MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];

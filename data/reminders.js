@@ -11,7 +11,7 @@
  *
  * SAMPLE DATA — replace with your own.
  */
-Atlas.add(
+Metis.add(
   {
     type: 'reminder', title: 'Pay vendor B invoice', due: '2026-10-06', project: 'Vendor Onboarding',
     text: 'Invoice #4471 — net 30.', priority: 'high', keywords: ['invoice', 'finance']

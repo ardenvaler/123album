@@ -4,7 +4,7 @@
  */
 (function () {
   'use strict';
-  var T = Atlas.text, D = Atlas.dates, V = Atlas.view, C = Atlas.charts, S = Atlas.store, R = Atlas.reminders, I = Atlas.insights;
+  var T = Metis.text, D = Metis.dates, V = Metis.view, C = Metis.charts, S = Metis.store, R = Metis.reminders, I = Metis.insights;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var esc = T.esc;
@@ -33,8 +33,8 @@
     placeholderLoop();
     revealObserver();
 
-    Atlas.on('change', function () { renderHeader(); renderLanding(); if (state.query) runSearch(state.query, true); if (state.sheetFor) reopenSheet(); });
-    Atlas.on('reminders', function () { renderBanners(); if (!state.query) renderNextUp(); });
+    Metis.on('change', function () { renderHeader(); renderLanding(); if (state.query) runSearch(state.query, true); if (state.sheetFor) reopenSheet(); });
+    Metis.on('reminders', function () { renderBanners(); if (!state.query) renderNextUp(); });
 
     setInterval(function () { renderHeader(); }, 60 * 1000);
     applyHash();
@@ -55,7 +55,7 @@
     var apply = function () {
       if (applied) return; applied = true;
       document.documentElement.setAttribute('data-theme', t);
-      try { localStorage.setItem('atlas.theme', t); } catch (e) {}
+      try { localStorage.setItem('metis.theme', t); } catch (e) {}
     };
     if (!document.startViewTransition || reduceMotion) return apply();
     var x = origin ? origin.x : innerWidth / 2, y = origin ? origin.y : 0;
@@ -74,7 +74,7 @@
     setTimeout(function () { if (!applied) { apply(); try { vt.skipTransition(); } catch (e) {} } }, 350);
     setTimeout(done, 1200);
   }
-  Atlas.setTheme = function (t) { setTheme(t === 'toggle' ? (currentTheme() === 'dark' ? 'light' : 'dark') : t); };
+  Metis.setTheme = function (t) { setTheme(t === 'toggle' ? (currentTheme() === 'dark' ? 'light' : 'dark') : t); };
 
   // ======================================================================
   // Header / greeting
@@ -151,7 +151,7 @@
   var insightList = [], insightIdx = 0, insightTimer = null;
   function insightHTML() {
     insightList = I.list();
-    var head = '<header class="tile-head"><span class="tile-label"><span class="orb xs" aria-hidden="true"><i></i><i></i><i></i></span>Atlas noticed</span>' +
+    var head = '<header class="tile-head"><span class="tile-label"><span class="orb xs" aria-hidden="true"><i></i><i></i><i></i></span>Metis noticed</span>' +
       (insightList.length > 1 ? '<span class="dots" role="tablist">' + insightList.slice(0, 6).map(function (_, i) { return '<button class="dotbtn' + (i === 0 ? ' on' : '') + '" data-insight="' + i + '" aria-label="Insight ' + (i + 1) + '"></button>'; }).join('') + '</span>' : '') + '</header>';
     if (!insightList.length) return head + '<p class="muted">Add some data and I’ll point out what matters.</p>';
     return head + '<div class="insight-stage">' + insightCard(insightList[0]) + '</div>';
@@ -288,7 +288,7 @@
   function closeSuggest() { el.suggest.classList.remove('open'); state.sugIdx = -1; }
 
   function renderSuggest(v) {
-    var list = Atlas.query.suggest(v, 6);
+    var list = Metis.query.suggest(v, 6);
     state.sugIdx = -1;
     if (!list.length) { closeSuggest(); el.suggest.innerHTML = ''; return; }
     var icons = { project: 'folder', table: 'grid', metric: 'gauge', reminder: 'bell', math: 'sparkle', keyword: 'tag', suggestion: 'sparkle' };
@@ -306,7 +306,7 @@
 
   function renderUnderstood(v) {
     if (!v.trim()) { el.understood.innerHTML = ''; return; }
-    var it = Atlas.query.parse(v);
+    var it = Metis.query.parse(v);
     var chips = [];
     it.types.forEach(function (t) { chips.push(['type', t === 'project' ? 'Projects' : S.TYPES[t].plural]); });
     if (it.range) chips.push(['time', it.range.label]);
@@ -333,7 +333,7 @@
 
   function runSearch(q, live) {
     var res;
-    try { res = Atlas.query.run(q); } catch (err) { console.error(err); return; }
+    try { res = Metis.query.run(q); } catch (err) { console.error(err); return; }
     var wasSearching = document.body.classList.contains('searching');
     state.query = q; state.run = res; state.filter = 'all';
     var draw = function () {
@@ -345,7 +345,7 @@
     if (!live) closeSuggest();
     if (el.q.value !== q && !live) { el.q.value = q; renderUnderstood(q); }
   }
-  Atlas.search = function (q) { el.q.value = q; renderUnderstood(q); commit(q); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); };
+  Metis.search = function (q) { el.q.value = q; renderUnderstood(q); commit(q); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); };
 
   function goHome(soft) {
     state.query = ''; state.run = null;
@@ -428,7 +428,7 @@
     else if (k.project && S.projectByKey.get(k.project)) el.sheetBody.innerHTML = V.projectSheet(S.projectByKey.get(k.project));
     else closeSheet();
   }
-  Atlas.open = openEntry;
+  Metis.open = openEntry;
 
   // ======================================================================
   // Reminder banners
@@ -526,7 +526,7 @@
       if (d.action === 'home') { ev.preventDefault(); el.q.value = ''; goHome(); closeSheet(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
       if (d.open) { ev.preventDefault(); openEntry(d.open); return; }
       if (d.project) { openProject(d.project); return; }
-      if (d.q) { ev.preventDefault(); if (state.sheetFor) closeSheet(); Atlas.search(d.q); return; }
+      if (d.q) { ev.preventDefault(); if (state.sheetFor) closeSheet(); Metis.search(d.q); return; }
     });
     document.addEventListener('keydown', function (ev) {
       if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'k') { ev.preventDefault(); el.q.focus(); el.q.select(); return; }
@@ -542,7 +542,7 @@
       var r = el.themeBtn.getBoundingClientRect();
       setTheme(currentTheme() === 'dark' ? 'light' : 'dark', { x: r.left + r.width / 2, y: r.top + r.height / 2 });
     });
-    el.browseBtn.addEventListener('click', function () { Atlas.search('everything'); });
+    el.browseBtn.addEventListener('click', function () { Metis.search('everything'); });
     el.bellBtn.addEventListener('click', function () { if (state.tucked || !$('.banner', el.banners)) showBanners(); else { state.tucked = true; $$('.banner', el.banners).forEach(dismissBanner); } });
     window.addEventListener('popstate', applyHash);
 
@@ -677,7 +677,7 @@
     b.className = 'banner toast in'; b.innerHTML = '<div class="banner-body"><strong>' + esc(msg) + '</strong></div>';
     el.banners.appendChild(b); setTimeout(function () { dismissBanner(b); }, 3200);
   }
-  Atlas.toast = toast;
+  Metis.toast = toast;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

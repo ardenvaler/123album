@@ -9,7 +9,7 @@
  *
  * SAMPLE DATA — replace with your own.
  */
-Atlas.add(
+Metis.add(
   {
     type: 'update', date: '2026-10-07', project: 'Apollo Platform',
     text: 'Finished migrating the finance dashboards to the new warehouse. Query times dropped from ~40s to under 5s.',

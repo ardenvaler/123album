@@ -9,7 +9,7 @@
  *
  * SAMPLE DATA — replace with your own.
  */
-Atlas.add(
+Metis.add(
   {
     type: 'metric', id: 'active-users', title: 'Active users', value: 12480, date: '2026-10-07',
     history: [9100, 9600, 10200, 10050, 10900, 11400, 11800, 12480], target: 12000,

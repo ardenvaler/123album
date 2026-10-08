@@ -2,7 +2,7 @@
 """Bundle the dashboard into one self-contained HTML file (CSS, JS and data inlined).
 
 Used to publish the private claude.ai preview link:
-    python3 tools/build_artifact.py /path/to/atlas.html
+    python3 tools/build_artifact.py /path/to/metis.html
 The output omits <html>/<head>/<body> because the artifact host adds its own skeleton.
 """
 import re
@@ -34,4 +34,4 @@ def main(out):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1] if len(sys.argv) > 1 else 'atlas.html')
+    main(sys.argv[1] if len(sys.argv) > 1 else 'metis.html')

@@ -7,8 +7,8 @@
  */
 (function () {
   'use strict';
-  var T = Atlas.text, D = Atlas.dates, A = Atlas.analyze;
-  var S = (Atlas.store = { entries: [], byId: new Map(), projects: [], projectByKey: new Map() });
+  var T = Metis.text, D = Metis.dates, A = Metis.analyze;
+  var S = (Metis.store = { entries: [], byId: new Map(), projects: [], projectByKey: new Map() });
 
   var TYPE_ALIASES = {
     update: 'update', status: 'update', progress: 'update', log: 'update', news: 'update', done: 'update',
@@ -195,15 +195,15 @@
   }
 
   S.build = function () {
-    var raws = Atlas._raw.map(function (r) { return [r, 'data']; })
-      .concat(Atlas.storage.get('local', []).map(function (r) { return [r, 'local']; }))
+    var raws = Metis._raw.map(function (r) { return [r, 'data']; })
+      .concat(Metis.storage.get('local', []).map(function (r) { return [r, 'local']; }))
       .concat((S._session || []).map(function (r) { return [r, 'session']; }));
 
     var seen = {};
     S.entries = raws.map(function (p) {
       var e;
       try { e = normalize(p[0], p[1]); }
-      catch (err) { console.warn('[Atlas] Skipped an entry that could not be read:', p[0], err); return null; }
+      catch (err) { console.warn('[Metis] Skipped an entry that could not be read:', p[0], err); return null; }
       var base = p[0].id || e.type + '-' + T.slug(e.title);
       e.id = seen[base] ? base + '-' + (++seen[base]) : base;
       seen[base] = seen[base] || 1;
@@ -271,14 +271,14 @@
 
     S.vocab = Array.from(new Set(S.entries.reduce(function (a, e) { return a.concat(Object.keys(e._idx)); }, [])));
     buildProjects();
-    Atlas.emit('build', S);
+    Metis.emit('build', S);
     return S;
   };
 
   function buildProjects() {
     var map = new Map();
     function key(n) { return T.slug(n); }
-    Atlas._projects.forEach(function (p, i) {
+    Metis._projects.forEach(function (p, i) {
       if (!p || !p.name) return;
       map.set(key(p.name), {
         name: p.name, key: key(p.name), description: p.description || '', status: S.statusKey(p.status),
@@ -313,23 +313,23 @@
 
   // ---------- local (browser-saved) entries ----------
   S.addLocal = function (raw) {
-    var list = Atlas.storage.get('local', []);
+    var list = Metis.storage.get('local', []);
     raw.id = raw.id || 'local-' + Date.now().toString(36);
     raw.created = raw.created || D.iso(D.today());
     list.push(raw);
-    Atlas.storage.set('local', list);
-    S.build(); Atlas.emit('change', { added: raw.id });
+    Metis.storage.set('local', list);
+    S.build(); Metis.emit('change', { added: raw.id });
     return S.byId.get(raw.id);
   };
   S.removeLocal = function (id) {
-    Atlas.storage.set('local', Atlas.storage.get('local', []).filter(function (r) { return r.id !== id; }));
-    S.build(); Atlas.emit('change', { removed: id });
+    Metis.storage.set('local', Metis.storage.get('local', []).filter(function (r) { return r.id !== id; }));
+    S.build(); Metis.emit('change', { removed: id });
   };
   S.addSession = function (raw) {
     S._session = S._session || [];
     raw.id = raw.id || 'session-' + Date.now().toString(36);
     S._session.push(raw);
-    S.build(); Atlas.emit('change', { added: raw.id });
+    S.build(); Metis.emit('change', { added: raw.id });
     return S.byId.get(raw.id);
   };
   S.keepSession = function (id) {
@@ -337,7 +337,7 @@
     if (!raw) return;
     S._session = S._session.filter(function (r) { return r !== raw; });
     raw.id = raw.id.replace(/^session-/, 'local-');
-    var list = Atlas.storage.get('local', []); list.push(raw); Atlas.storage.set('local', list);
-    S.build(); Atlas.emit('change', {});
+    var list = Metis.storage.get('local', []); list.push(raw); Metis.storage.set('local', list);
+    S.build(); Metis.emit('change', {});
   };
 })();

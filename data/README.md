@@ -1,6 +1,6 @@
 # Data format
 
-Each file in this folder calls `Atlas.add({...}, {...})` with one or more entries. Files are plain
+Each file in this folder calls `Metis.add({...}, {...})` with one or more entries. Files are plain
 JavaScript so the dashboard works when opened straight from disk (no server needed).
 
 Every entry can have these common fields. All of them are optional except what makes the entry useful.
@@ -73,7 +73,7 @@ as ordered, so trends are computed.
 ## projects.js (optional)
 
 ```js
-Atlas.project({ name: 'Apollo Platform', aliases: ['Apollo'], description: '…',
+Metis.project({ name: 'Apollo Platform', aliases: ['Apollo'], description: '…',
                 status: 'in progress', progress: 65, owner: 'Me' })
 ```
 

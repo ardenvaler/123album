@@ -2,17 +2,17 @@
  * Insights: short, data-driven observations + suggested questions.
  * Used by the control center and the assistant.
  *
- *   Atlas.insights.list()    -> [{ tone, icon, title, html, query, weight }]
- *   Atlas.insights.tips()    -> [{ text, query }]  suggested things to ask
- *   Atlas.insights.summary() -> numbers for the landing page
+ *   Metis.insights.list()    -> [{ tone, icon, title, html, query, weight }]
+ *   Metis.insights.tips()    -> [{ text, query }]  suggested things to ask
+ *   Metis.insights.summary() -> numbers for the landing page
  */
 (function () {
   'use strict';
-  var T = Atlas.text, D = Atlas.dates;
-  var I = (Atlas.insights = {});
+  var T = Metis.text, D = Metis.dates;
+  var I = (Metis.insights = {});
 
   I.summary = function () {
-    var S = Atlas.store, R = Atlas.reminders, t = D.today();
+    var S = Metis.store, R = Metis.reminders, t = D.today();
     var weekAgo = D.addDays(t, -7);
     var rem = R.all();
     var updates = S.entries.filter(function (e) { return e.type === 'update'; });
@@ -31,7 +31,7 @@
   };
 
   I.list = function () {
-    var S = Atlas.store, R = Atlas.reminders, t = D.today(), out = [];
+    var S = Metis.store, R = Metis.reminders, t = D.today(), out = [];
     var rem = R.all();
 
     var overdue = rem.filter(function (s) { return s.state === 'overdue'; });
@@ -91,7 +91,7 @@
   };
 
   I.tips = function () {
-    var S = Atlas.store, tips = [], seen = new Set();
+    var S = Metis.store, tips = [], seen = new Set();
     function add(text) { if (!seen.has(text)) { seen.add(text); tips.push({ text: text, query: text }); } }
     var s = I.summary();
     if (s.overdue) add('what’s overdue');

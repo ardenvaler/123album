@@ -1,9 +1,9 @@
 /*
  * Natural-language query engine.
  *
- *   Atlas.query.parse("total cost by team in Q3 budget")  -> intent
- *   Atlas.query.run("what's due this week")               -> { intent, items, answer, agg, chips }
- *   Atlas.query.suggest("rev")                            -> autocomplete phrases
+ *   Metis.query.parse("total cost by team in Q3 budget")  -> intent
+ *   Metis.query.run("what's due this week")               -> { intent, items, answer, agg, chips }
+ *   Metis.query.suggest("rev")                            -> autocomplete phrases
  *
  * It understands: kinds of entries, time ranges, statuses, projects, people,
  * "how many" questions, table math (total / average / highest / lowest / trend,
@@ -11,8 +11,8 @@
  */
 (function () {
   'use strict';
-  var T = Atlas.text, D = Atlas.dates, A = Atlas.analyze;
-  var Q = (Atlas.query = {});
+  var T = Metis.text, D = Metis.dates, A = Metis.analyze;
+  var Q = (Metis.query = {});
 
   var TYPE_RX = [
     ['reminder', /\b(reminders?|remind(?:ers)?|deadlines?|due(?: dates?)?|to-?dos?|appointments?|events?)\b/],
@@ -81,7 +81,7 @@
     s = take(s, /\b(?:by|per|for each|each|grouped by|split by|broken down by) ([a-z0-9][a-z0-9 \-]{0,30}?)(?= in | from | for | of |\s*$)/, function (m) { it.by = m[1].trim(); });
 
     // Projects — full name or alias, longest first
-    Atlas.store.projects.slice().sort(function (a, b) { return b.name.length - a.name.length; }).forEach(function (p) {
+    Metis.store.projects.slice().sort(function (a, b) { return b.name.length - a.name.length; }).forEach(function (p) {
       [p.name].concat(p.aliases).forEach(function (nm) {
         var n = T.norm(nm).replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
         if (!n) return;
@@ -97,7 +97,7 @@
 
   // ---------- term expansion (synonyms, prefixes, typos) ----------
   function expand(term) {
-    var S = Atlas.store, out = [[term, 1]];
+    var S = Metis.store, out = [[term, 1]];
     T.synonyms(term).forEach(function (s) { out.push([s, 0.8]); });
     if (term.length >= 3) S.vocab.forEach(function (v) {
       if (v === term || v.length <= term.length) return;
@@ -112,7 +112,7 @@
   }
 
   function scoreEntry(e, expansions) {
-    var S = Atlas.store, total = 0, hit = 0;
+    var S = Metis.store, total = 0, hit = 0;
     expansions.forEach(function (ex) {
       var best = 0;
       ex.forEach(function (p) {
@@ -125,14 +125,14 @@
   }
 
   function entryDate(e) {
-    if (e.type === 'reminder') { var s = Atlas.reminders.state(e); return s && s.occ ? s.occ : e.date; }
+    if (e.type === 'reminder') { var s = Metis.reminders.state(e); return s && s.occ ? s.occ : e.date; }
     return e.date;
   }
 
   function inRange(e, rg) {
     if (!rg) return true;
     if (rg.kind === 'overdue') {
-      if (e.type === 'reminder') return Atlas.reminders.state(e).state === 'overdue';
+      if (e.type === 'reminder') return Metis.reminders.state(e).state === 'overdue';
       return e.status === 'risk' || e.status === 'blocked';
     }
     var d = entryDate(e);
@@ -144,7 +144,7 @@
   function statusOk(e, list) {
     if (!list.length) return true;
     if (e.type === 'reminder') {
-      var st = Atlas.reminders.state(e);
+      var st = Metis.reminders.state(e);
       return list.some(function (k) { return k === 'done' ? st.done : k === 'planned' || k === 'active' ? !st.done : false; });
     }
     if (e.type === 'metric' && e.metric.target != null) {
@@ -156,7 +156,7 @@
   // ---------- table math ----------
   function colTokens(name) { return T.tokens(name); }
   function resolveTable(it) {
-    var S = Atlas.store;
+    var S = Metis.store;
     var tables = S.entries.filter(function (e) { return e.type === 'table' && (!it.projects.length || it.projects.indexOf(e.projectKey) >= 0); });
     if (!tables.length) return null;
     // Match columns against the raw words too: "completed", "done", "top" can be column names
@@ -196,7 +196,7 @@
 
   // ---------- run ----------
   Q.run = function (raw) {
-    var S = Atlas.store;
+    var S = Metis.store;
     var it = Q.parse(raw);
     var out = { intent: it, items: [], projects: [], agg: null, chips: chips(it) };
     if (it.help) { out.answer = { kind: 'help', html: helpHTML() }; return out; }
@@ -269,20 +269,20 @@
 
   // ---------- natural-language answer ----------
   function compose(it, out) {
-    var R = Atlas.reminders, n = out.items.length;
+    var R = Metis.reminders, n = out.items.length;
     var where = [];
-    if (it.projects.length) where.push('in ' + it.projects.map(function (k) { return '<b>' + T.esc(Atlas.store.projectByKey.get(k).name) + '</b>'; }).join(' & '));
+    if (it.projects.length) where.push('in ' + it.projects.map(function (k) { return '<b>' + T.esc(Metis.store.projectByKey.get(k).name) + '</b>'; }).join(' & '));
     if (it.range) where.push(it.range.kind === 'overdue' ? '' : it.range.kind === 'upcoming' ? 'coming up' : rangePhrase(it.range));
     var whereTxt = where.filter(Boolean).join(' ');
 
     if (out.agg) {
       return { kind: 'agg', html: out.agg.text + '<span class="ans-src"> — from <a href="#" data-open="' + T.esc(out.agg.entry.id) + '">' + T.esc(out.agg.entry.title) + '</a></span>' };
     }
-    var typeWord = it.types.length === 1 && it.types[0] !== 'project' ? Atlas.store.TYPES[it.types[0]] : null;
+    var typeWord = it.types.length === 1 && it.types[0] !== 'project' ? Metis.store.TYPES[it.types[0]] : null;
     var noun = function (k) { return typeWord ? (k === 1 ? typeWord.label.toLowerCase() : typeWord.plural.toLowerCase()) : (k === 1 ? 'result' : 'results'); };
     var isMetric = it.types.length === 1 && it.types[0] === 'metric';
     var statusTxt = it.status.length ? (isMetric ? ' <b>' : ' marked <b>') + it.status.map(function (s) {
-      return isMetric ? (s === 'done' ? 'on target' : 'off target') : Atlas.store.STATUS[s].label.toLowerCase();
+      return isMetric ? (s === 'done' ? 'on target' : 'off target') : Metis.store.STATUS[s].label.toLowerCase();
     }).join(' or ') + '</b>' : '';
 
     if (it.types.length === 1 && it.types[0] === 'project' && !n) {
@@ -311,7 +311,7 @@
       return { kind: 'list', html: '<b>' + n + '</b> ' + noun(n) + (whereTxt ? ' ' + whereTxt : '') + '.' + (first ? ' Next: <b>' + T.esc(first.entry.title) + '</b> — ' + T.esc(first.label.toLowerCase()) + '.' : '') };
     }
     if (it.projects.length === 1 && !it.terms.length && !typeWord) {
-      return { kind: 'project', html: projectSentence(Atlas.store.projectByKey.get(it.projects[0])) + (it.range || it.status.length ? ' <b>' + n + '</b> ' + noun(n) + statusTxt + (it.range ? ' ' + rangePhrase(it.range) : '') + '.' : '') };
+      return { kind: 'project', html: projectSentence(Metis.store.projectByKey.get(it.projects[0])) + (it.range || it.status.length ? ' <b>' + n + '</b> ' + noun(n) + statusTxt + (it.range ? ' ' + rangePhrase(it.range) : '') + '.' : '') };
     }
     var lead = '<b>' + n + '</b> ' + noun(n) + statusTxt + (whereTxt ? ' ' + whereTxt : '') + (it.terms.length ? ' for “' + T.esc(it.rest || it.raw) + '”' : '') + '.';
     var detail = top.type === 'update' ? ' Latest: <b>' + T.esc(latest(out.items).title) + '</b> (' + D.relative(latest(out.items).date) + ').'
@@ -326,7 +326,7 @@
   function breakdown(items) {
     var c = {}; items.forEach(function (x) { c[x.entry.type] = (c[x.entry.type] || 0) + 1; });
     var k = Object.keys(c); if (k.length < 2) return '';
-    return ' <span class="ans-mute">(' + k.map(function (t) { var ty = Atlas.store.TYPES[t]; return c[t] + ' ' + (ty ? (c[t] === 1 ? ty.label : ty.plural).toLowerCase() : t); }).join(', ') + ')</span>';
+    return ' <span class="ans-mute">(' + k.map(function (t) { var ty = Metis.store.TYPES[t]; return c[t] + ' ' + (ty ? (c[t] === 1 ? ty.label : ty.plural).toLowerCase() : t); }).join(', ') + ')</span>';
   }
   function rangePhrase(r) {
     var l = r.label || '';
@@ -337,13 +337,13 @@
   }
   function projectSentence(p) {
     if (!p) return '';
-    var st = p.status ? Atlas.store.STATUS[p.status].label.toLowerCase() : 'active';
+    var st = p.status ? Metis.store.STATUS[p.status].label.toLowerCase() : 'active';
     return '<b>' + T.esc(p.name) + '</b> is ' + st + (p.progress != null ? ' at <b>' + Math.round(p.progress) + '%</b>' : '') +
       (p.last ? '. Last update ' + D.relative(p.lastDate) + ': “' + T.esc(p.last.title) + '”' : '') + '.';
   }
 
   function didYouMean(it) {
-    var S = Atlas.store;
+    var S = Metis.store;
     if (!it.terms.length) return null;
     var changed = false;
     var fixed = it.terms.map(function (t) {
@@ -358,10 +358,10 @@
 
   function chips(it) {
     var c = [];
-    it.types.forEach(function (t) { c.push({ kind: 'type', label: t === 'project' ? 'Projects' : Atlas.store.TYPES[t].plural }); });
+    it.types.forEach(function (t) { c.push({ kind: 'type', label: t === 'project' ? 'Projects' : Metis.store.TYPES[t].plural }); });
     if (it.range) c.push({ kind: 'time', label: it.range.label });
-    it.status.forEach(function (s) { c.push({ kind: 'status', label: Atlas.store.STATUS[s].label }); });
-    it.projects.forEach(function (k) { var p = Atlas.store.projectByKey.get(k); if (p) c.push({ kind: 'project', label: p.name }); });
+    it.status.forEach(function (s) { c.push({ kind: 'status', label: Metis.store.STATUS[s].label }); });
+    it.projects.forEach(function (k) { var p = Metis.store.projectByKey.get(k); if (p) c.push({ kind: 'project', label: p.name }); });
     if (it.op) c.push({ kind: 'op', label: { sum: 'Total', avg: 'Average', max: it.n ? 'Top ' + it.n : 'Highest', min: it.n ? 'Bottom ' + it.n : 'Lowest', trend: 'Trend', median: 'Median' }[it.op] });
     if (it.count) c.push({ kind: 'op', label: 'Count' });
     if (it.by) c.push({ kind: 'op', label: 'By ' + it.by });
@@ -383,7 +383,7 @@
 
   // ---------- autocomplete ----------
   Q.phrases = function () {
-    var S = Atlas.store, out = [], seen = new Set();
+    var S = Metis.store, out = [], seen = new Set();
     function add(text, kind, weight) { var k = T.norm(text); if (!k || seen.has(k)) return; seen.add(k); out.push({ text: text, kind: kind, w: weight || 1 }); }
     ['what’s due this week', 'what’s overdue', 'updates this week', 'what did I finish last week', 'reminders next 7 days', 'metrics off target', 'recent notes', 'blocked projects']
       .forEach(function (t) { add(t, 'suggestion', 1.2); });
@@ -422,5 +422,5 @@
       .sort(function (a, b) { return b.s - a.s || a.p.text.length - b.p.text.length; })
       .slice(0, limit || 6).map(function (x) { return x.p; });
   };
-  Atlas.on('build', function () { Q._phrases = null; });
+  Metis.on('build', function () { Q._phrases = null; });
 })();

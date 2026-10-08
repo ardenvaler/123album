@@ -11,8 +11,8 @@
  */
 (function () {
   'use strict';
-  var D = Atlas.dates, T = Atlas.text;
-  var R = (Atlas.reminders = {});
+  var D = Metis.dates, T = Metis.text;
+  var R = (Metis.reminders = {});
 
   function occurrence(e) {
     var r = e.reminder, due = r.due;
@@ -35,7 +35,7 @@
   function conditionMet(e) {
     var c = e.reminder.condition;
     if (!c || !c.metric) return null;
-    var S = Atlas.store, target = S.byId.get(c.metric) ||
+    var S = Metis.store, target = S.byId.get(c.metric) ||
       S.entries.find(function (x) { return x.type === 'metric' && T.norm(x.title) === T.norm(c.metric); });
     if (!target || !target.metric || target.metric.value == null) return { met: false, missing: true };
     var v = target.metric.value, met = false, desc = '';
@@ -48,7 +48,7 @@
   function key(e, occ) { return e.id + '@' + (occ ? D.iso(occ) : 'cond'); }
   function isDone(e, occ) {
     if (e.status === 'done' && (!e.reminder.repeat || e.reminder.repeat === 'none')) return true;
-    return !!Atlas.storage.get('acks', {})[key(e, occ)];
+    return !!Metis.storage.get('acks', {})[key(e, occ)];
   }
 
   R.state = function (e) {
@@ -56,7 +56,7 @@
     var occ = occurrence(e), t = D.today(), cond = conditionMet(e);
     var s = { entry: e, occ: occ, key: key(e, occ), cond: cond };
     s.done = isDone(e, occ);
-    var snoozes = Atlas.storage.get('snooze', {});
+    var snoozes = Metis.storage.get('snooze', {});
     s.snoozed = snoozes[s.key] && snoozes[s.key] > Date.now();
     s.days = occ ? D.diffDays(t, occ) : null;
 
@@ -96,7 +96,7 @@
 
   R.all = function () {
     var rank = { now: 0, overdue: 1, triggered: 2, today: 3, soon: 4, later: 5, waiting: 6, none: 7, done: 8 };
-    return Atlas.store.entries.filter(function (e) { return e.type === 'reminder'; }).map(R.state)
+    return Metis.store.entries.filter(function (e) { return e.type === 'reminder'; }).map(R.state)
       .sort(function (a, b) { return rank[a.state] - rank[b.state] || (a.occ || 0) - (b.occ || 0); });
   };
   R.alerts = function () { return R.all().filter(function (s) { return s.alert; }); };
@@ -105,35 +105,35 @@
   };
 
   R.markDone = function (e) {
-    var s = R.state(e), acks = Atlas.storage.get('acks', {});
-    acks[s.key] = D.iso(D.today()); Atlas.storage.set('acks', acks);
-    Atlas.emit('reminders', {});
+    var s = R.state(e), acks = Metis.storage.get('acks', {});
+    acks[s.key] = D.iso(D.today()); Metis.storage.set('acks', acks);
+    Metis.emit('reminders', {});
   };
   R.undo = function (e, occKey) {
-    var acks = Atlas.storage.get('acks', {});
-    delete acks[occKey || R.state(e).key]; Atlas.storage.set('acks', acks);
-    Atlas.emit('reminders', {});
+    var acks = Metis.storage.get('acks', {});
+    delete acks[occKey || R.state(e).key]; Metis.storage.set('acks', acks);
+    Metis.emit('reminders', {});
   };
   R.snooze = function (e, hours) {
-    var s = R.state(e), sn = Atlas.storage.get('snooze', {});
-    sn[s.key] = Date.now() + (hours || 24) * 36e5; Atlas.storage.set('snooze', sn);
-    Atlas.emit('reminders', {});
+    var s = R.state(e), sn = Metis.storage.get('snooze', {});
+    sn[s.key] = Date.now() + (hours || 24) * 36e5; Metis.storage.set('snooze', sn);
+    Metis.emit('reminders', {});
   };
 
   // System notifications (opt-in) — one per occurrence per day
   R.notifySystem = function (s) {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    var sent = Atlas.storage.get('notified', {}), k = s.key + '#' + D.iso(D.today());
+    var sent = Metis.storage.get('notified', {}), k = s.key + '#' + D.iso(D.today());
     if (sent[k]) return;
-    sent[k] = 1; Atlas.storage.set('notified', sent);
+    sent[k] = 1; Metis.storage.set('notified', sent);
     try { new Notification(s.entry.title, { body: s.label + (s.entry.text ? ' — ' + s.entry.text : ''), tag: s.key }); } catch (e) {}
   };
 
-  // Periodic check; fires `Atlas.emit('reminders')` each minute so the UI refreshes
+  // Periodic check; fires `Metis.emit('reminders')` each minute so the UI refreshes
   R.start = function () {
     var tick = function () {
       R.alerts().forEach(R.notifySystem);
-      Atlas.emit('reminders', { tick: true });
+      Metis.emit('reminders', { tick: true });
     };
     setTimeout(tick, 1200);
     setInterval(tick, 60 * 1000);

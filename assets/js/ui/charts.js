@@ -5,8 +5,8 @@
  */
 (function () {
   'use strict';
-  var T = Atlas.text;
-  var C = (Atlas.charts = {});
+  var T = Metis.text;
+  var C = (Metis.charts = {});
   var uid = 0;
 
   function tip(label, value) {
