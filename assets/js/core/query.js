@@ -308,7 +308,7 @@
     if (typeWord && it.types[0] === 'reminder') {
       var states = out.items.map(function (x) { return R.state(x.entry); }).filter(function (s) { return !s.done; });
       var first = states.filter(function (s) { return s.days != null && s.days >= 0; })[0] || states[0];
-      return { kind: 'list', html: '<b>' + n + '</b> ' + noun(n) + (whereTxt ? ' ' + whereTxt : '') + '.' + (first ? ' Next: <b>' + T.esc(first.entry.title) + '</b> — ' + T.esc(first.label.toLowerCase()) + '.' : '') };
+      return { kind: 'list', html: '<b>' + n + '</b> ' + noun(n) + (whereTxt ? ' ' + whereTxt : '') + '.' + (first ? ' Next: <b>' + T.esc(first.entry.title) + '</b> — ' + T.esc(first.state === 'later' ? first.label : first.label.toLowerCase()) + '.' : '') };
     }
     if (it.projects.length === 1 && !it.terms.length && !typeWord) {
       return { kind: 'project', html: projectSentence(Metis.store.projectByKey.get(it.projects[0])) + (it.range || it.status.length ? ' <b>' + n + '</b> ' + noun(n) + statusTxt + (it.range ? ' ' + rangePhrase(it.range) : '') + '.' : '') };

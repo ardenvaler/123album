@@ -47,7 +47,7 @@
 
     var week = rem.filter(function (s) { return !s.done && s.days != null && s.days > 0 && s.days <= 7; });
     if (week.length) out.push({ tone: 'info', icon: 'calendar', weight: 6, title: T.plural(week.length, 'reminder') + ' in the next 7 days',
-      html: 'Next: <b>' + T.esc(week[0].entry.title) + '</b>, ' + D.relative(week[0].occ) + '.', query: 'reminders next 7 days' });
+      html: 'Next: <b>' + T.esc(week[0].entry.title) + '</b> on ' + D.fmt(week[0].occ, 'day') + (week[0].entry.reminder.time ? ' at ' + T.esc(week[0].entry.reminder.time) : '') + '.', query: 'reminders next 7 days' });
 
     // Metrics
     var metrics = S.entries.filter(function (e) { return e.type === 'metric' && e.metric.value != null; });

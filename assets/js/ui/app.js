@@ -123,7 +123,7 @@
     var next = R.next();
     var head = '<header class="tile-head"><span class="tile-label">' + V.icon('bell') + 'Next up</span>' +
       (urgent.length ? '<span class="badge-critical">' + urgent.length + ' need' + (urgent.length === 1 ? 's' : '') + ' you</span>' : '') + '</header>';
-    if (!next && !urgent.length) return head + '<div class="empty-tile"><p class="big-quiet">Nothing scheduled.</p><p class="muted">Add reminders in <code>data/reminders.js</code>, or ask the assistant “remind me to … on Friday”.</p></div>';
+    if (!next && !urgent.length) return head + '<div class="empty-tile"><p class="big-quiet">Nothing scheduled.</p><p class="muted">Reminders you send me, or tell the assistant “remind me to … on Friday”.</p></div>';
     var feat = urgent[0] || next;
     var occ = feat.occ, days = feat.days;
     var ring = '';
@@ -133,7 +133,7 @@
         '<div class="cd-in"><b>' + (days < 0 ? Math.abs(days) : days === 0 ? (feat.entry.reminder.time || 'Now') : days) + '</b><small>' +
         (days < 0 ? (Math.abs(days) === 1 ? 'day late' : 'days late') : days === 0 ? 'today' : days === 1 ? 'day left' : 'days left') + '</small></div></div>';
     } else ring = '<div class="countdown st-' + feat.state + '"><div class="cd-bolt">' + V.icon('bolt') + '</div></div>';
-    var rest = all.filter(function (x) { return x !== feat; }).slice(0, 3);
+    var rest = all.filter(function (x) { return x.entry !== feat.entry; }).slice(0, 3);
     return head +
       '<div class="next-feature" data-open="' + esc(feat.entry.id) + '" tabindex="0">' + ring +
       '<div class="next-copy"><p class="next-state st-' + feat.state + '">' + esc(feat.label) + '</p><h3>' + esc(feat.entry.title) + '</h3>' +
@@ -199,7 +199,7 @@
   function projectsHTML() {
     var ps = S.projects.slice(0, 5);
     var head = '<header class="tile-head"><span class="tile-label">' + V.icon('folder') + 'Projects</span><button class="tile-link" data-q="projects">See all</button></header>';
-    if (!ps.length) return head + '<p class="muted">Projects appear automatically when entries have a <code>project</code>.</p>';
+    if (!ps.length) return head + '<p class="muted">Projects appear here as soon as an update or reminder mentions one.</p>';
     return head + '<ul class="proj-list">' + ps.map(function (p) {
       var prog = p.progress != null ? Math.round(p.progress) : null;
       var st = p.status ? S.STATUS[p.status] : null;
@@ -213,7 +213,7 @@
   function updatesHTML() {
     var ups = S.entries.filter(function (e) { return e.type === 'update' || e.type === 'note'; }).sort(function (a, b) { return (b.date || 0) - (a.date || 0); }).slice(0, 4);
     var head = '<header class="tile-head"><span class="tile-label">' + V.icon('pulse') + 'Latest</span><button class="tile-link" data-q="recent updates">More</button></header>';
-    if (!ups.length) return head + '<p class="muted">Updates you add in <code>data/updates.js</code> show here.</p>';
+    if (!ups.length) return head + '<p class="muted">Status updates and notes on your work will appear here, newest first.</p>';
     return head + '<ol class="feed">' + ups.map(function (e) {
       var tone = e.status ? S.STATUS[e.status].tone : 'neutral';
       return '<li data-open="' + esc(e.id) + '" tabindex="0"><span class="feed-dot tone-' + tone + '"></span><div><p class="feed-t clamp2">' + esc(e.text || e.title) + '</p>' +
@@ -224,7 +224,7 @@
   function metricsHTML() {
     var ms = S.entries.filter(function (e) { return e.type === 'metric'; }).sort(function (a, b) { return (b.pinned - a.pinned) || (b.date || 0) - (a.date || 0); }).slice(0, 4);
     var head = '<header class="tile-head"><span class="tile-label">' + V.icon('gauge') + 'Key numbers</span><button class="tile-link" data-q="metrics">All</button></header>';
-    if (!ms.length) return head + '<p class="muted">Quick numbers from <code>data/metrics.js</code> show here.</p>';
+    if (!ms.length) return head + '<p class="muted">Quick numbers and datapoints show here with their trend and target.</p>';
     return head + '<div class="metric-grid">' + ms.map(function (e) {
       var m = e.metric;
       return '<div class="mt" data-open="' + esc(e.id) + '" tabindex="0"><small>' + esc(e.title) + '</small>' +
@@ -237,7 +237,7 @@
   function dataHTML() {
     var tables = S.entries.filter(function (e) { return e.type === 'table'; }).sort(function (a, b) { return (b.date || 0) - (a.date || 0); });
     var head = '<header class="tile-head"><span class="tile-label">' + V.icon('grid') + 'Data</span><button class="tile-link" data-q="tables">' + tables.length + ' table' + (tables.length === 1 ? '' : 's') + '</button></header>';
-    if (!tables.length) return head + '<p class="muted">Paste CSV into <code>data/tables.js</code> or drop a file here.</p>';
+    if (!tables.length) return head + '<p class="muted">Tables get a quick analysis here. You can also drop a CSV file anywhere on the page.</p>';
     var e = tables[0], an = e.table.analysis, P = an.primaryIdx >= 0 ? an.columns[an.primaryIdx] : null;
     return head + '<div class="data-feature" data-open="' + esc(e.id) + '" tabindex="0"><h3>' + esc(e.title) + '</h3>' +
       (P ? '<div class="data-hero"><b data-count="' + (P.additive ? P.sum : P.mean) + '" data-unit="' + esc(P.unit || (P.money ? '$' : '')) + '">' + T.fmt(P.additive ? P.sum : P.mean, P.unit || (P.money ? '$' : '')) + '</b><small>' + (P.additive ? 'total ' : 'avg ') + esc(P.name.toLowerCase()) + '</small></div>' +

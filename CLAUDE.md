@@ -13,12 +13,23 @@ After **every** change (data or code): rebuild the single-file bundle with
 tool (pass the URL as `url`; read it first if this session hasn't), commit + push, and give the owner
 the link in the reply.
 
+## Simple inputs — keep token use minimal (owner's request)
+
+For a simple sentence (a reminder, a status update, a datapoint, a note), do exactly this and nothing
+more: no file reads, no screenshots, no tests, no questions unless a date is truly ambiguous.
+
+1. One Bash call: `python3 tools/quick_add.py <scratchpad>/metis.html '<entry JSON>'`
+   (appends to the right data file, rebuilds the bundle, commits and pushes).
+2. One Artifact publish of `<scratchpad>/metis.html` to the live URL.
+3. Reply in 1–2 lines: what was added (date resolved) + the link.
+
+Use the full workflow (read files, verify in a browser) only for code changes or large/table data.
+
 ## Ingesting data the owner sends
 
 - Put each kind in its file: `data/updates.js`, `tables.js`, `metrics.js`, `reminders.js`,
   `notes.js`, `projects.js`. Format: `data/README.md`.
-- **Sample data:** the files currently contain sample entries (marked `SAMPLE DATA` in the header
-  comment). When the first real data arrives, ask whether to remove the samples, then remove them all.
+- **Sample data:** removed on 2026-10-08 at the owner's request; all entries in `/data` are real.
 - Tables: paste CSV as-is into `csv:` (template literal). Keep the owner's column names.
 - Updates: one entry per status sentence. Set `project`, `date`, `status` when stated or obvious.
 - Reminders: anything with a date the owner wants to be told about. Use `notify` for lead time and
