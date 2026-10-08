@@ -23,6 +23,12 @@ more: no file reads, no screenshots, no tests, no questions unless a date is tru
 2. One Artifact publish of `<scratchpad>/metis.html` to the live URL.
 3. Reply in 1–2 lines: what was added (date resolved) + the link.
 
+Tickets (reminders and to-dos only): `quick_add.py` assigns the next `T-NNN` automatically; a
+to-do is `{"type": "todo", "title": …}` (a reminder with no date). To act on one, single Bash call:
+`python3 tools/ticket.py <scratchpad>/metis.html close|reopen|delete T-001 [T-002…]` or
+`… edit T-001 '{"due": "2026-10-13", "time": null}'` (null removes a field), then publish + 1-line reply.
+Entries in data files stay one JSON object per line so these tools can edit them.
+
 Use the full workflow (read files, verify in a browser) only for code changes or large/table data.
 
 ## Ingesting data the owner sends

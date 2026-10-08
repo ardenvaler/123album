@@ -90,7 +90,7 @@
       case 'triggered': return 'Condition met';
       case 'waiting': return s.cond && s.cond.missing ? 'Waiting · metric not found' : 'Watching';
       case 'done': return 'Done';
-      default: return 'No date';
+      default: return 'To do';
     }
   }
 

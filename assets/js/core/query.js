@@ -54,13 +54,14 @@
 
   Q.parse = function (raw) {
     var s = ' ' + T.norm(raw).replace(/[?!,;:"“”()]/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
-    var it = { raw: raw, types: [], status: [], projects: [], terms: [], op: null, n: null, by: null, count: false, sort: null, range: null, all: false };
+    var it = { raw: raw, types: [], status: [], projects: [], terms: [], op: null, n: null, by: null, count: false, sort: null, range: null, all: false, ticket: null };
 
     if (/^\s*(help|\?|what can you do|how does this work|tips?)\s*$/.test(s)) { it.help = true; return it; }
 
     s = take(s, /\bhow many\b|\bcount of\b|\bnumber of\b|\bhow much\b/, function (m) { it.count = m[0] !== 'how much'; if (m[0] === 'how much') it.op = 'sum'; });
     s = take(s, /\b(most recent|latest|newest|last few)\b/, function () { it.sort = 'recent'; });
     s = take(s, /\b(everything|all entries|all items|show all|browse)\b/, function () { it.all = true; });
+    s = take(s, /\b(?:ticket|tkt)s?\s*#?\s*(?:t-?)?0*(\d{1,4})\b|\bt-0*(\d{1,4})\b|#0*(\d{1,4})\b/, function (m) { it.ticket = +(m[1] || m[2] || m[3]); });
 
     var rg = D.findRange(s);
     if (rg) {
@@ -229,6 +230,7 @@
     } else S.entries.forEach(function (e) {
       if (types.length && types.indexOf(e.type) < 0) return;
       if (it.projects.length && it.projects.indexOf(e.projectKey) < 0) return;
+      if (it.ticket != null && e.ticketNum !== it.ticket) return;
       if (!statusOk(e, it.status)) return;
       if (!inRange(e, it.range)) return;
       var sc = scoreEntry(e, expansions);
@@ -365,6 +367,7 @@
     if (it.op) c.push({ kind: 'op', label: { sum: 'Total', avg: 'Average', max: it.n ? 'Top ' + it.n : 'Highest', min: it.n ? 'Bottom ' + it.n : 'Lowest', trend: 'Trend', median: 'Median' }[it.op] });
     if (it.count) c.push({ kind: 'op', label: 'Count' });
     if (it.by) c.push({ kind: 'op', label: 'By ' + it.by });
+    if (it.ticket != null) c.push({ kind: 'type', label: 'Ticket T-' + ('00' + it.ticket).slice(-3) });
     if (it.sort === 'recent') c.push({ kind: 'time', label: 'Most recent' });
     it.terms.forEach(function (t) { c.push({ kind: 'term', label: t }); });
     return c;

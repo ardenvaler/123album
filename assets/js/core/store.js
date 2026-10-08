@@ -130,7 +130,8 @@
       keywords: arr(raw.keywords || raw.tags),
       people: arr(raw.people || raw.owner || raw.with || raw.who),
       url: raw.url || raw.link || null,
-      pinned: !!raw.pinned
+      pinned: !!raw.pinned,
+      ticket: raw.ticket ? String(raw.ticket).toUpperCase() : null
     };
     e.date = D.parse(raw.date || raw.updated || raw.created || (type === 'reminder' ? null : raw.due));
     e.status = S.statusKey(raw.status) || (type === 'update' ? inferStatus(e.title + '. ' + e.text) : null);
@@ -138,6 +139,8 @@
     if (type === 'table') { e.table = tableFrom(raw); }
     if (type === 'metric') { e.metric = metricFrom(raw); }
     if (type === 'reminder') { e.reminder = reminderFrom(raw); if (!e.date) e.date = e.reminder.due; }
+    if (type !== 'reminder') e.ticket = null;
+    if (e.ticket) e.ticketNum = parseInt(e.ticket.replace(/\D/g, ''), 10) || null;
     return e;
   }
 
@@ -174,6 +177,7 @@
     function put(field, list) { list.forEach(function (t) { if (t) f[t] = Math.max(f[t] || 0, WEIGHTS[field]); }); }
     put('title', T.tokens(e.title));
     put('kw', T.tokens(e.keywords.join(' ')));
+    if (e.ticket) put('title', T.tokens(e.ticket));
     put('project', T.tokens(e.project || ''));
     put('people', T.tokens(e.people.join(' ')));
     put('text', T.tokens(e.text));

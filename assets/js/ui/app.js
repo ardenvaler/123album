@@ -118,7 +118,7 @@
   function tile(name, cls, inner) { return '<section class="tile ' + cls + '" data-tile="' + name + '">' + inner + '</section>'; }
 
   function nextUpHTML() {
-    var all = R.all().filter(function (x) { return !x.done && x.state !== 'waiting' && x.state !== 'none'; });
+    var all = R.all().filter(function (x) { return !x.done && x.state !== 'waiting'; });
     var urgent = all.filter(function (x) { return x.state === 'overdue' || x.state === 'now' || x.state === 'triggered'; });
     var next = R.next();
     var head = '<header class="tile-head"><span class="tile-label">' + V.icon('bell') + 'Next up</span>' +
@@ -136,10 +136,10 @@
     var rest = all.filter(function (x) { return x.entry !== feat.entry; }).slice(0, 3);
     return head +
       '<div class="next-feature" data-open="' + esc(feat.entry.id) + '" tabindex="0">' + ring +
-      '<div class="next-copy"><p class="next-state st-' + feat.state + '">' + esc(feat.label) + '</p><h3>' + esc(feat.entry.title) + '</h3>' +
+      '<div class="next-copy"><p class="next-state st-' + feat.state + '">' + esc(feat.label) + V.ticket(feat.entry) + '</p><h3>' + esc(feat.entry.title) + '</h3>' +
       (feat.entry.text ? '<p class="muted clamp2">' + esc(feat.entry.text) + '</p>' : '') + '</div></div>' +
       (rest.length ? '<ul class="next-list">' + rest.map(function (x) {
-        return '<li data-open="' + esc(x.entry.id) + '" tabindex="0"><span class="nl-dot st-' + x.state + '"></span><span class="nl-t">' + esc(x.entry.title) + '</span><span class="nl-d">' + esc(x.label) + '</span></li>';
+        return '<li data-open="' + esc(x.entry.id) + '" tabindex="0"><span class="nl-dot st-' + x.state + '"></span><span class="nl-t">' + esc(x.entry.title) + '</span>' + V.ticket(x.entry) + '<span class="nl-d">' + esc(x.label) + '</span></li>';
       }).join('') + '</ul>' : '') +
       '<button class="tile-more" data-q="reminders next 30 days">All reminders ' + V.icon('arrow') + '</button>';
   }
@@ -485,7 +485,7 @@
   function bannerInner(s) {
     var e = s.entry;
     return '<div class="banner-ic st-' + s.state + '">' + V.icon(s.state === 'triggered' ? 'bolt' : 'bell') + '</div>' +
-      '<div class="banner-body" data-open="' + esc(e.id) + '"><div class="banner-top"><span>Reminder</span><span>' + esc(s.label) + '</span></div>' +
+      '<div class="banner-body" data-open="' + esc(e.id) + '"><div class="banner-top"><span>Reminder' + (e.ticket ? ' · ' + esc(e.ticket) : '') + '</span><span>' + esc(s.label) + '</span></div>' +
       '<strong>' + esc(e.title) + '</strong>' + (s.state === 'triggered' && s.cond ? '<p>' + esc(s.cond.text) + '</p>' : e.text ? '<p>' + esc(e.text) + '</p>' : '') + '</div>' +
       '<div class="banner-actions"><button data-b-done="' + esc(e.id) + '">Done</button><button data-b-snooze="' + esc(e.id) + '">Later</button></div>' +
       '<button class="banner-x" data-b-close="' + esc(s.key) + '" aria-label="Dismiss">' + '<svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></svg></button>';

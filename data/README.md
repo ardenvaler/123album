@@ -62,6 +62,13 @@ as ordered, so trends are computed.
   condition: { metric: 'open-tickets', above: 35 } }   // or below / equals
 ```
 
+### Tickets (reminders and to-dos only)
+
+Every reminder and to-do gets a ticket number such as `T-001` (`ticket` field). It shows as a small tag
+on the dashboard, is searchable ("T-001", "ticket 1"), and lets you say "close T-001" or "move T-002 to
+Friday". A to-do is a reminder without a `due` date. `data/tickets.json` remembers the last number so
+numbers are never reused.
+
 ## note / link / anything else
 
 ```js

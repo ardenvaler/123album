@@ -39,6 +39,9 @@
   };
   V.tonePill = function (tone, label) { return '<span class="pill tone-' + tone + '"><i class="pill-dot"></i>' + esc(label) + '</span>'; };
 
+  // Subtle ticket tag for reminders / to-dos, e.g. T-001
+  V.ticket = function (e) { return e && e.ticket ? '<span class="tkt" title="Ticket number">' + esc(e.ticket) + '</span>' : ''; };
+
   V.kw = function (e, max) {
     var user = e.keywords.slice(0, max || 4).map(function (k) { return '<button class="kw" data-q="' + esc(k) + '">' + esc(k) + '</button>'; });
     return user.length ? '<div class="kws">' + user.join('') + '</div>' : '';
@@ -101,7 +104,7 @@
     }
     var typeLabel = Metis.store.TYPES[e.type] ? Metis.store.TYPES[e.type].label : T.cap(e.type);
     return '<article class="' + cls + '" tabindex="0" data-open="' + esc(e.id) + '" style="--i:' + (i || 0) + '">' +
-      '<header class="card-head"><span class="type type-' + esc(e.type) + '">' + V.typeIcon(e.type) + typeLabel + '</span><span class="card-meta">' + meta(e) + '</span></header>' +
+      '<header class="card-head"><span class="type type-' + esc(e.type) + '">' + V.typeIcon(e.type) + typeLabel + '</span><span class="card-meta">' + (e.ticket ? V.ticket(e) + ' ' : '') + meta(e) + '</span></header>' +
       body + V.kw(e, 3) + '</article>';
   };
 
@@ -130,7 +133,7 @@
   // ---------- detail sheets ----------
   V.sheet = function (e) {
     var typeLabel = Metis.store.TYPES[e.type] ? Metis.store.TYPES[e.type].label : T.cap(e.type);
-    var h = '<header class="sheet-head"><span class="type type-' + esc(e.type) + '">' + V.typeIcon(e.type) + typeLabel + '</span>' +
+    var h = '<header class="sheet-head"><span class="type type-' + esc(e.type) + '">' + V.typeIcon(e.type) + typeLabel + '</span>' + (e.ticket ? ' ' + V.ticket(e) : '') +
       '<h2 id="sheetTitle">' + esc(e.title) + '</h2><p class="sheet-meta">' + meta(e) + (e.date && e.type !== 'reminder' ? '<span class="dot-sep">·</span>' + esc(D.fmt(e.date, 'long')) : '') + '</p></header>';
     if (e.type === 'table') h += tableSheet(e);
     else if (e.type === 'metric') h += metricSheet(e);

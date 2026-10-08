@@ -131,7 +131,7 @@
     }).join('') + '</ul>';
     if (rows.length) h += '<ul class="msg-list">' + rows.map(function (x) {
       var e = x.entry, sub = e.type === 'reminder' ? Metis.reminders.state(e).label : e.type === 'metric' ? T.fmt(e.metric.value, e.metric.unit) : e.date ? D.relative(e.date) : '';
-      return '<li data-open="' + esc(e.id) + '">' + V.typeIcon(e.type) + '<span>' + esc(e.title) + '</span><small>' + esc(sub) + '</small></li>';
+      return '<li data-open="' + esc(e.id) + '">' + V.typeIcon(e.type) + '<span>' + esc(e.title) + '</span>' + V.ticket(e) + '<small>' + esc(sub) + '</small></li>';
     }).join('') + '</ul>';
     if (res.items.length > 4 || res.agg) h += '<button class="msg-cta" data-dash="' + esc(q) + '">Show ' + (res.agg ? 'it' : 'all ' + res.items.length) + ' on the dashboard ' + V.icon('arrow') + '</button>';
     h += chips(followUps(res));
